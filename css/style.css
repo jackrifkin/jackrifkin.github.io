@@ -832,6 +832,6 @@ p {
   font-style: italic;
 }
 
-footer {
-  color: #000;
+.footer {
+  background-color: #000;
 }
