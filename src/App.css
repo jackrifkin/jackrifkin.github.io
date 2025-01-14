@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(to bottom, #3ca1bc, #055d76);
+  overflow: hidden;
+}
+
+.seaweed {
+  width: 100%;
+  height: 60%;
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+img {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

@@ -1,0 +1,18 @@
+.header_container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.bubbles_container {
+  position: relative;
+  margin-top: -200px;
+}
+
+.bubble {
+  transform: translateY(200px);
+  transition: transform 2s ease-out;
+}
