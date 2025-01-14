@@ -5,7 +5,7 @@ body {
   height: 100%;
   margin: 0;
   background: linear-gradient(to bottom, #3ca1bc, #055d76);
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .seaweed {
