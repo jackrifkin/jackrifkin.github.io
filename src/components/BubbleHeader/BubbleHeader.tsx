@@ -43,9 +43,13 @@ const BubbleHeader = () => {
           if (bubblesRef.current) {
             bubblesRef.current.appendChild(bubble);
 
-            bubble.onload = () => {
-              bubble.style.transform = "translateY(0)";
-            };
+            listeners.push(() => {
+              const listener = () => {
+                bubble.style.transform = "translateY(0)";
+              };
+              window.addEventListener("load", listener);
+              return () => window.removeEventListener("load", listener);
+            });
 
             listeners.push(() => {
               const listener = () => {
@@ -95,7 +99,7 @@ const BubbleHeader = () => {
       svgRef.current.innerHTML = "";
 
       return () => {
-        listeners.forEach((removeListener) => removeListener());
+        listeners.map((removeListener) => removeListener());
       };
     }
   }, [svgRef, bubblesRef, screenWidth]);
@@ -107,7 +111,7 @@ const BubbleHeader = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [screenWidth]);
+  }, []);
 
   return (
     <>
