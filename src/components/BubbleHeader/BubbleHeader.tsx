@@ -43,13 +43,9 @@ const BubbleHeader = () => {
           if (bubblesRef.current) {
             bubblesRef.current.appendChild(bubble);
 
-            listeners.push(() => {
-              const listener = () => {
-                bubble.style.transform = "translateY(0)";
-              };
-              window.addEventListener("load", listener);
-              return () => window.removeEventListener("load", listener);
-            });
+            bubble.onload = () => {
+              bubble.style.transform = "translateY(0)";
+            };
 
             listeners.push(() => {
               const listener = () => {
