@@ -16,7 +16,7 @@ const useBubbleHeader = () => {
       const bubbleSize =
         screenWidth < SM_SCREEN_WIDTH ? SM_BUBBLE_SIZE : REG_BUBBLE_SIZE;
 
-      const listeners: (() => void)[] = [];
+      const removeListeners: (() => void)[] = [];
       paths.forEach((pathElement) => {
         const pathLength = pathElement.getTotalLength();
         for (let i = 0; i < pathLength; i += bubbleSize) {
@@ -40,54 +40,55 @@ const useBubbleHeader = () => {
           if (bubblesRef.current) {
             bubblesRef.current.appendChild(bubble);
 
-            listeners.push(() => {
-              const listener = () => {
-                bubble.style.transform = "translateY(0)";
-              };
-              window.addEventListener("load", listener);
-              return () => window.removeEventListener("load", listener);
+            const loadListener = () => {
+              bubble.style.transform = "translateY(0)";
+            };
+            window.addEventListener("load", loadListener);
+            removeListeners.push(() => {
+              window.removeEventListener("load", loadListener);
             });
 
-            listeners.push(() => {
-              const listener = () => {
-                bubble.style.animation = `bob ${
-                  bubbleSize === REG_BUBBLE_SIZE ? 1.5 : 1.7
-                }s infinite alternate ease-in-out`;
-                bubble.style.transition = `transform ${1.3 + timing}s ease-out`;
-              };
-              bubble.addEventListener("transitionend", listener);
-              return () =>
-                bubble.removeEventListener("transitionend", listener);
+            const transitionend_listener = () => {
+              bubble.style.animation = `bob ${
+                bubbleSize === REG_BUBBLE_SIZE ? 1.5 : 1.7
+              }s infinite alternate ease-in-out`;
+              bubble.style.transition = `transform ${1.3 + timing}s ease-out`;
+            };
+            bubble.addEventListener("transitionend", transitionend_listener);
+            removeListeners.push(() => {
+              bubble.removeEventListener(
+                "transitionend",
+                transitionend_listener
+              );
             });
 
-            listeners.push(() => {
-              const handleMouseMove = (event: MouseEvent) => {
-                const bubbleRect = bubble.getBoundingClientRect();
-                const bubbleRadius = bubbleSize / 2;
-                const mouseX = event.clientX - bubbleRect.left + bubbleRadius;
-                const mouseY = event.clientY - bubbleRect.top + bubbleRadius;
-                const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+            const handleMouseMove = (event: MouseEvent) => {
+              const bubbleRect = bubble.getBoundingClientRect();
+              const bubbleRadius = bubbleSize / 2;
+              const mouseX = event.clientX - bubbleRect.left + bubbleRadius;
+              const mouseY = event.clientY - bubbleRect.top + bubbleRadius;
+              const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
 
-                if (distance > MIN_MOUSE_PROXIMITY) return;
-                const dx = bubbleRadius - mouseX;
-                const dy = bubbleRadius - mouseY;
+              if (distance > MIN_MOUSE_PROXIMITY) return;
+              const dx = bubbleRadius - mouseX;
+              const dy = bubbleRadius - mouseY;
 
-                const angle = Math.atan2(dy, dx);
-                const force = MIN_MOUSE_PROXIMITY - distance;
-                const moveX = Math.cos(angle) * force;
-                const moveY = Math.sin(angle) * force;
+              const angle = Math.atan2(dy, dx);
+              const force = MIN_MOUSE_PROXIMITY - distance;
+              const moveX = Math.cos(angle) * force;
+              const moveY = Math.sin(angle) * force;
 
-                bubble.style.animation = "";
-                bubble.style.transition = "transform 0.3s ease-out";
-                bubble.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                setTimeout(() => {
-                  bubble.style.transition = "transform 0.3s ease-in-out";
-                  bubble.style.transform = "translate(0, 0)";
-                }, 300);
-              };
-              window.addEventListener("mousemove", handleMouseMove);
-              return () =>
-                window.removeEventListener("mousemove", handleMouseMove);
+              bubble.style.animation = "";
+              bubble.style.transition = "transform 0.3s ease-out";
+              bubble.style.transform = `translate(${moveX}px, ${moveY}px)`;
+              setTimeout(() => {
+                bubble.style.transition = "transform 0.3s ease-in-out";
+                bubble.style.transform = "translate(0, 0)";
+              }, 300);
+            };
+            window.addEventListener("mousemove", handleMouseMove);
+            removeListeners.push(() => {
+              window.removeEventListener("mousemove", handleMouseMove);
             });
           }
         }
@@ -96,7 +97,7 @@ const useBubbleHeader = () => {
       svgRef.current.innerHTML = "";
 
       return () => {
-        listeners.map((removeListener) => removeListener());
+        removeListeners.forEach((removeListener) => removeListener());
       };
     }
   }, [svgRef, bubblesRef, screenWidth]);
